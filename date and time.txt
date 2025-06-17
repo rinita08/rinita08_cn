@@ -1,0 +1,104 @@
+anu
+
+Server.java 
+import java.io.*; 
+import java.net.*; 
+import java.util.Date; 
+public class Server { 
+public static void main(String[] args) throws IOException { 
+ServerSocket ss = new ServerSocket(5000); 
+System.out.println("Server started..."); 
+Socket s = ss.accept(); 
+PrintWriter out = new PrintWriter(s.getOutputStream(), true); 
+out.println("Server date and time: " + new Date()); 
+ss.close(); 
+} 
+} 
+
+Client.java 
+import java.io.*; 
+import java.net.*; 
+public class Client { 
+public static void main(String[] args) throws IOException { 
+Socket s = new Socket("localhost", 5000); 
+BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream())); 
+System.out.println(in.readLine()); 
+s.close(); 
+} 
+}
+
+
+debu
+
+DateTimeServer.java 
+import java.io.DataOutputStream; 
+import java.net.ServerSocket; 
+import java.net.Socket; 
+import java.util.Date; 
+ 
+public class DateTimeServer { 
+    public static void main(String[] args) { 
+        try { 
+            // Server listens on port 9999 
+            ServerSocket serverSocket = new ServerSocket(9999); 
+            System.out.println("Server is running and waiting for a 
+client..."); 
+ 
+            // Accept client connection 
+            Socket clientSocket = serverSocket.accept(); 
+            System.out.println("Client connected: " + 
+clientSocket.getInetAddress().getHostAddress()); 
+ 
+            // Create output stream to send data to the client 
+            DataOutputStream dos = new 
+DataOutputStream(clientSocket.getOutputStream()); 
+ 
+            // Get current date and time 
+            Date currentDate = new Date(); 
+            String dateTimeString = currentDate.toString(); 
+ 
+            // Write the date and time string to the client 
+            dos.writeUTF("Current Server Date & Time: " + 
+dateTimeString); 
+            dos.flush(); 
+ 
+            // Close resources 
+            dos.close(); 
+            clientSocket.close(); 
+            serverSocket.close(); 
+            System.out.println("Connection closed."); 
+ 
+        } catch (Exception e) { 
+            System.out.println(e); 
+        } 
+    } 
+} 
+ 
+DateTimeClient.java 
+import java.io.DataInputStream; 
+import java.net.Socket; 
+ 
+public class DateTimeClient { 
+    public static void main(String[] args) { 
+        try { 
+            // Client connects to the server at localhost on port 9999 
+            Socket socket = new Socket("localhost", 9999); 
+            System.out.println("Connected to the server."); 
+ 
+            // Create input stream to receive data from the server 
+            DataInputStream dis = new 
+DataInputStream(socket.getInputStream()); 
+ 
+            // Read the date and time string from the server 
+            String dateTimeString = dis.readUTF(); 
+            System.out.println(dateTimeString); 
+ 
+            // Close resources 
+            dis.close(); 
+            socket.close(); 
+ 
+        } catch (Exception e) { 
+            System.out.println(e); 
+        } 
+    } 
+} 

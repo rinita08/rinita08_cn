@@ -1,0 +1,96 @@
+anu
+
+import java.util.Scanner; 
+public class SubnetCalculator { 
+public static void main(String[] args) { 
+Scanner sc = new Scanner(System.in); 
+System.out.print("Enter number of hosts required: "); 
+int hosts = sc.nextInt(); 
+int bits = 0; 
+while (Math.pow(2, bits) - 2 < hosts) bits++; 
+int subnetMask = 32 - bits; 
+int totalAddresses = (int) Math.pow(2, bits); 
+System.out.println("Subnet Mask: /" + subnetMask); 
+System.out.println("Total IPs: " + totalAddresses); 
+System.out.println("Usable Hosts: " + (totalAddresses - 2)); 
+sc.close(); 
+} 
+}
+
+debu
+
+import java.util.Scanner; 
+ 
+public class SubnetCalculator { 
+ 
+    public static void main(String[] args) { 
+        Scanner scanner = new Scanner(System.in); 
+ 
+        System.out.print("Enter site address (e.g., 201.70.64.0): "); 
+        String siteAddress = scanner.nextLine(); 
+ 
+        System.out.print("Enter the number of subnets required: "); 
+        int numSubnets = scanner.nextInt(); 
+ 
+        // --- 1. Determine bits to borrow --- 
+        int bitsToBorrow = 0; 
+        // Smallest 'n' such that 2^n >= numSubnets 
+        while (Math.pow(2, bitsToBorrow) < numSubnets) { 
+            bitsToBorrow++; 
+        } 
+        System.out.println("\nBits to borrow: " + bitsToBorrow); 
+ 
+        // --- 2. Determine default mask --- 
+        String[] octetsStr = siteAddress.split("\\."); 
+        int firstOctet = Integer.parseInt(octetsStr[0]); 
+        int defaultMaskPrefix = 0; 
+        if (firstOctet >= 1 && firstOctet <= 126) defaultMaskPrefix = 
+8; 
+        else if (firstOctet >= 128 && firstOctet <= 191) 
+defaultMaskPrefix = 16; 
+        else if (firstOctet >= 192 && firstOctet <= 223) 
+defaultMaskPrefix = 24; 
+        else { 
+            System.out.println("Invalid or unsupported IP address 
+class."); 
+            return; 
+        } 
+ 
+        // --- 3. Calculate new subnet mask --- 
+        int newMaskPrefix = defaultMaskPrefix + bitsToBorrow; 
+        System.out.println("New Subnet Mask Prefix: /" + 
+newMaskPrefix); 
+ 
+        // Convert prefix to decimal mask 
+        long mask = 0xFFFFFFFFL << (32 - newMaskPrefix); 
+        String subnetMask = String.format("%d.%d.%d.%d", 
+                (mask >> 24) & 0xFF, (mask >> 16) & 0xFF, (mask >> 8) 
+& 0xFF, mask & 0xFF); 
+        System.out.println("New Subnet Mask: " + subnetMask); 
+ 
+        // --- 4. Calculate and print subnet addresses --- 
+        long ipAsLong = 0; 
+        for (String octet : octetsStr) { 
+            ipAsLong = (ipAsLong << 8) | Integer.parseInt(octet); 
+        } 
+ 
+        long baseNetworkAddress = ipAsLong & mask; 
+        long blockSize = 1L << (32 - newMaskPrefix); 
+        long numberOfPossibleSubnets = 1L << bitsToBorrow; 
+ 
+        System.out.println("\n--- Subnetwork Addresses ---"); 
+        for (int i = 0; i < numberOfPossibleSubnets; i++) { 
+            long currentSubnetAddress = baseNetworkAddress + (i * 
+blockSize); 
+             String subnetAddrStr = String.format("%d.%d.%d.%d", 
+                (currentSubnetAddress >> 24) & 0xFF, 
+                (currentSubnetAddress >> 16) & 0xFF, 
+                (currentSubnetAddress >> 8) & 0xFF, 
+                currentSubnetAddress & 0xFF); 
+            System.out.println("Subnet " + (i+1) + ": " + 
+subnetAddrStr + "/" + newMaskPrefix); 
+        } 
+         
+        scanner.close(); 
+    } 
+}

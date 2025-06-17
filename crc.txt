@@ -1,0 +1,124 @@
+anu
+
+CRCGenerator.java 
+import java.util.Scanner; 
+public class CRCGenerator { 
+public static void main(String[] args) { 
+Scanner sc = new Scanner(System.in); 
+System.out.print("Enter binary data: "); 
+String data = sc.nextLine(); 
+System.out.print("Enter generator polynomial: "); 
+String divisor = sc.nextLine(); 
+String dividend = data + "0".repeat(divisor.length() - 1); 
+String remainder = divide(dividend, divisor); 
+String crc = remainder; 
+System.out.println("CRC: " + crc); 
+System.out.println("Transmitted Data: " + data + crc); 
+sc.close(); 
+} 
+private static String divide(String dividend, String divisor) { 
+int pick = divisor.length(); 
+String tmp = dividend.substring(0, pick); 
+while (pick < dividend.length()) { 
+if (tmp.charAt(0) == '1') 
+tmp = xor(divisor, tmp) + dividend.charAt(pick); 
+else 
+tmp = xor("0".repeat(pick), tmp) + dividend.charAt(pick); 
+pick += 1; 
+} 
+if (tmp.charAt(0) == '1') 
+tmp = xor(divisor, tmp); 
+else 
+tmp = xor("0".repeat(pick), tmp); 
+return tmp; 
+} 
+private static String xor(String a, String b) { 
+StringBuilder result = new StringBuilder(); 
+for (int i = 1; i < a.length(); i++) 
+result.append(a.charAt(i) == b.charAt(i) ? '0' : '1'); 
+return result.toString(); 
+} 
+}
+
+debu
+
+#include <stdio.h> 
+#include <string.h> 
+ 
+#define MAX_LEN 100 
+ 
+// Function to perform XOR operation 
+void xorOperation(char *result, const char *divisor, int len) { 
+    for (int i = 0; i < len; i++) { 
+        // If bits are the same, result is 0; otherwise, 1 
+        result[i] = (result[i] == divisor[i]) ? '0' : '1'; 
+    } 
+} 
+ 
+// Function to generate CRC 
+void generateCRC(const char *data, const char *generator, char *crc) { 
+    int dataLen = strlen(data); 
+    int genLen = strlen(generator); 
+ 
+    // Create a temporary dividend by appending n-1 zeros to data 
+    char dividend[MAX_LEN]; 
+    strcpy(dividend, data); 
+    for (int i = 0; i < genLen - 1; i++) { 
+        strcat(dividend, "0"); 
+    } 
+    int dividendLen = strlen(dividend); 
+ 
+    // Perform modulo-2 division 
+    char tempDivisor[MAX_LEN]; 
+    for (int i = 0; i <= dividendLen - genLen; ) { 
+        if (dividend[i] == '1') { 
+            // Perform XOR only if the leading bit is 1 
+            xorOperation(&dividend[i], generator, genLen); 
+        } 
+        i++; 
+    } 
+ 
+    // The remainder is the last (genLen - 1) bits of the dividend 
+    strncpy(crc, &dividend[dataLen], genLen - 1); 
+    crc[genLen - 1] = '\0'; 
+} 
+ 
+int main() { 
+    char data[MAX_LEN]; 
+    char generator[MAX_LEN]; 
+    char crc[MAX_LEN]; 
+ 
+    printf("Enter the data string (binary): "); 
+    scanf("%s", data); 
+ 
+    printf("Enter the generator polynomial (binary): "); 
+    scanf("%s", generator); 
+ 
+    // Check for valid binary inputs (simple check) 
+    for(int i=0; i<strlen(data); i++){ 
+        if(data[i] != '0' && data[i] != '1'){ 
+            printf("Invalid data string.\n"); 
+            return 1; 
+        } 
+    } 
+     for(int i=0; i<strlen(generator); i++){ 
+        if(generator[i] != '0' && generator[i] != '1'){ 
+            printf("Invalid generator string.\n"); 
+            return 1; 
+        } 
+    } 
+ 
+    generateCRC(data, generator, crc); 
+ 
+    printf("\nData: %s\n", data); 
+    printf("Generator: %s\n", generator); 
+    printf("Generated CRC (Remainder): %s\n", crc); 
+ 
+    // The codeword to be transmitted 
+    char codeword[MAX_LEN]; 
+    strcpy(codeword, data); 
+    strcat(codeword, crc); 
+    printf("Codeword to be transmitted: %s\n", codeword); 
+ 
+    return 0; 
+}

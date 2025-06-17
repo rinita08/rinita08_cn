@@ -1,0 +1,270 @@
+1. An ISP is granted a block of addresses starting with 190.100.0.0/16. The ISP needs to 
+distribute these addresses to three groups of customers as follows: i. The first group has 
+64 customers; each needs 256 addresses. ii. The second group has 128 customers; each 
+needs 128 addresses. iii. The third group has 128 customers; each needs 64 addresses. 
+Here is a possible design for the address allocation using Variable Length Subnet Masking 
+(VLSM). We will allocate the largest blocks first. 
+Group 1 & 2 Calculation (same total size) 
+● Group 1: 64 customers × 256 addresses/customer = 16,384 total addresses. 
+● Group 2: 128 customers × 128 addresses/customer = 16,384 total addresses. To 
+accommodate 16,384 addresses, we need a block size of 2^{14} (since 2^{14} = 16,384). 
+This corresponds to a CIDR prefix of 32 - 14 = /18. 
+Group 3 Calculation 
+● Group 3: 128 customers × 64 addresses/customer = 8,192 total addresses. To 
+accommodate 8,192 addresses, we need a block size of 2^{13} (since 2^{13} = 8,192). 
+This corresponds to a CIDR prefix of 32 - 13 = /19. 
+Address Allocation 
+We start with the initial block: 190.100.0.0/16 (Range: 190.100.0.0 to 190.100.255.255). 
+1. Allocation for Group 1 (/18 block): 
+○ Subnet Address: 190.100.0.0/18 
+○ Address Range: 190.100.0.0 to 190.100.63.255. This block provides 16,384 
+addresses. 
+2. Allocation for Group 2 (/18 block): 
+○ The next available address is 190.100.64.0. 
+○ Subnet Address: 190.100.64.0/18 
+○ Address Range: 190.100.64.0 to 190.100.127.255. This block provides 16,384 
+addresses. 
+3. Allocation for Group 3 (/19 block): 
+○ The next available address is 190.100.128.0. 
+○ Subnet Address: 190.100.128.0/19 
+○ Address Range: 190.100.128.0 to 190.100.159.255. This block provides 8,192 
+addresses. 
+
+Summary of Allocation: 
+● Group 1: 190.100.0.0/18 
+● Group 2: 190.100.64.0/18 
+● Group 3: 190.100.128.0/19 
+
+
+
+
+3. A supernet has a first address of 205.16.32.0 and a supernet mask of 255.255.248.0. 
+State the number of blocks are in this supernet and what is the range of addresses? 
+1. Find the CIDR Prefix: The supernet mask is 255.255.248.0. Let's convert this to binary: 
+11111111.11111111.11111000.00000000 Counting the number of 1s gives the prefix: 8 + 8 + 5 = 
+21. So, the mask is /21. 
+2. Number of Blocks: The first address, 205.16.32.0, belongs to a Class C range (192-223). A 
+standard Class C network has a /24 mask. The supernet mask is /21. The number of combined 
+Class C blocks is calculated as: 2^{(\text{Class C prefix} - \text{Supernet prefix})} = 2^{(24 - 21)} 
+= 2^3 = 8. So, there are 8 blocks of Class C networks in this supernet. 
+3. Range of Addresses: 
+● First Address (Network Address): 205.16.32.0 
+● Calculate the total number of addresses: The host portion of the address is 32 - 21 = 
+11 bits. The total number of addresses is 2^{11} = 2048. 
+● Calculate the Last Address (Broadcast Address): 
+○ The network address is 205.16.32.0. 
+○ The last address is found by adding (Total Addresses - 1) to the first address. In the 
+IP address, this means adding 2047 to the host part. 
+○ The address range covers from 205.16.32.0 to 205.16.(32 + 7).255. 
+○ The last octet will be 255. The third octet will be 32 + (2048 / 256 - 1) = 32 + 7 = 39. 
+○ So, the last address is 205.16.39.255. 
+● Address Range: The range of addresses is from 205.16.32.0 to 205.16.39.255. 
+5. A company is granted the site address 201.70.64.0. The company needs six subnets 
+design the subnets. 
+1. Determine Bits to Borrow: 
+● The given site address 201.70.64.0 is a Class C address, which has a default subnet 
+mask of /24 (255.255.255.0). 
+● The company needs six subnets. We need to find the number of bits (n) to borrow from 
+the host part such that 2^n \ge 6. 
+● If n=2, 2^2 = 4 (not enough). 
+● If n=3, 2^3 = 8 (sufficient). 
+● So, we need to borrow 3 bits. 
+2. Calculate the New Subnet Mask: 
+● The new subnet mask is the default mask plus the borrowed bits: 24 + 3 = /27. 
+● In decimal, the mask is 255.255.255.224 (11111111.11111111.11111111.11100000). 
+3. Calculate Subnet Details: 
+● Number of addresses per subnet: The host part has 32 - 27 = 5 bits. So, each subnet 
+has 2^5 = 32 addresses. 
+● Block Size (Increment): The increment for each subnet is 32 in the fourth octet. 
+
+4. Design the Subnets: Here are the first six subnets: 
+● Subnet 1: 
+○ Subnet Address: 201.70.64.0/27 
+○ Range: 201.70.64.0 - 201.70.64.31 
+● Subnet 2: 
+○ Subnet Address: 201.70.64.32/27 
+○ Range: 201.70.64.32 - 201.70.64.63 
+● Subnet 3: 
+○ Subnet Address: 201.70.64.64/27 
+○ Range: 201.70.64.64 - 201.70.64.95 
+● Subnet 4: 
+○ Subnet Address: 201.70.64.96/27 
+○ Range: 201.70.64.96 - 201.70.64.127 
+● Subnet 5: 
+○ Subnet Address: 201.70.64.128/27 
+○ Range: 201.70.64.128 - 201.70.64.159 
+● Subnet 6: 
+○ Subnet Address: 201.70.64.160/27 
+○ Range: 201.70.64.160 - 201.70.64.191 
+
+
+
+
+6. Write down the subnet work number of a host with an IP address of 172.16.66.0/21? 
+To find the subnet work number (also known as the subnet address or network ID), we perform 
+a bitwise AND operation between the IP address and the subnet mask. 
+1. IP Address: 172.16.66.0 
+2. Subnet Mask: /21, which is 255.255.248.0 in decimal. 
+Let's convert the third octet of both the IP and the mask to binary, as this is where the subnet 
+boundary lies. 
+● IP Address (172.16. 66 .0): 10101100.00010000.01000010.00000000 
+● Subnet Mask (255.255. 248 .0): 11111111.11111111.11111000.00000000 
+Now, perform the bitwise AND operation: 
+10101100.00010000.01000010.00000000  (IP Address: 172.16.66.0) 
+& 11111111.11111111.11111000.00000000  (Subnet Mask: 255.255.248.0) ------------------------------------- 
+10101100.00010000.01000000.00000000  (Result) 
+Finally, convert the resulting binary address back to decimal: 
+● 10101100 = 172 
+● 00010000 = 16 
+● 01000000 = 64 
+● 00000000 = 0 
+The subnet work number is 172.16.64.0. 
+
+
+
+
+
+7. You need to subnet a network that has 5 subnets, each with at least 16 hosts. State 
+classful subnet mask would you use? 
+Let's analyze the requirements: 
+1. Host Requirement: At least 16 hosts per subnet. 
+○ The formula for usable hosts is 2^h - 2, where h is the number of host bits. 
+○ 2^h - 2 \ge 16 \implies 2^h \ge 18. 
+○ 2^4 = 16 (not enough). 2^5 = 32 (sufficient). 
+○ So, we need to reserve at least 5 bits for hosts. 
+2. Subnet Requirement: 5 subnets. 
+○ The formula for subnets is 2^s, where s is the number of subnet bits. 
+○ 2^s \ge 5. 
+○ 2^2 = 4 (not enough). 2^3 = 8 (sufficient). 
+○ So, we need to borrow at least 3 bits for subnets. 
+The most efficient classful network to use would be a Class C network. A Class C network has 
+a default /24 mask, leaving 8 bits for hosts. 
+● We need 3 bits for subnets and 5 bits for hosts. 
+● Total bits needed from the host portion = 3 + 5 = 8. 
+● This fits perfectly into the 8 host bits of a Class C address. 
+Subnet Mask Calculation: 
+● Start with the default Class C mask: /24 (255.255.255.0). 
+● Borrow 3 bits for the subnets. 
+● New subnet mask prefix: 24 + 3 = /27. 
+● The /27 mask in decimal is 255.255.255.224. 
+This mask creates 2^3 = 8 subnets, and each subnet has 2^5 = 32 addresses (30 usable hosts), 
+satisfying both conditions. 
+
+
+
+
+
+8. Your company has the network ID 165.121.0.0. You are responsible for creating 
+subnets on the network, and each subnet must provide at least 900 host IDs. State the 
+subnet mask which meets the requirement for the minimum number of host IDs and 
+provides the greatest number of subnets? 
+1. Identify Network Class: The network ID 165.121.0.0 is a Class B network, which has a 
+default mask of /16 (255.255.0.0). 
+2. Calculate Required Host Bits: 
+○ Each subnet needs at least 900 host IDs. 
+○ Using the formula 2^h - 2 \ge 900, where h is the number of host bits. 
+○ 2^h \ge 902. 
+○ 2^9 = 512 (too small). 
+○ 2^{10} = 1024 (sufficient). 
+○ So, we must reserve 10 bits for the host part. 
+3. Determine the Subnet Mask: 
+○ The total number of bits in an IPv4 address is 32. 
+○ To get 10 host bits, the subnet mask must have 32 - 10 = 22 network bits. 
+○ The CIDR prefix for the subnet mask is /22. 
+4. Convert to Decimal Notation: 
+○ A /22 mask in binary is 11111111.11111111.11111100.00000000. 
+○ Converting this to decimal gives 255.255.252.0. 
+This subnet mask (255.255.252.0 or /22) meets the requirement of at least 900 hosts (providing 
+2^{10} - 2 = 1022 usable hosts) and maximizes the number of subnets because it uses the 
+minimum possible number of host bits.
+
+
+ 
+9. Write down the broadcast address on subnet 32 given a prefix notation of 12.1.0.0/12? 
+1. Analyze the Prefix: The prefix is 12.1.0.0/12. 
+○ Subnet Mask: /12, which is 255.240.0.0. 
+○ The subnetting is done in the second octet. 
+2. Determine the Subnet Range: 
+○ The block size in the second octet is 256 - 240 = 16. 
+○ This means the valid network addresses for the second octet are multiples of 16: 0, 
+16, 32, 48, etc. 
+3. Identify the Target Subnet: 
+○ The question asks for "subnet 32", which refers to the subnet whose network 
+address is 12.32.0.0/12. 
+4. Calculate the Broadcast Address: 
+○ The broadcast address is the last address in the subnet's range. To find it, we can 
+find the next subnet's address and subtract one. 
+○ The current subnet is 12. 32 .0.0. 
+○ The next subnet would be 12. (32 + 16) .0.0 = 12.48.0.0. 
+○ The broadcast address for the 12.32.0.0 subnet is the address just before 
+12.48.0.0. 
+○ Therefore, the broadcast address is 12.47.255.255. 
+
+
+
+10. An organization is granted the blocks 130.56.0.0. The administrator wants to create 
+1024 fixed length subnets. i. Find the subnet mask. ii. Find the number of addresses in 
+each subnet. iii. Find the first and last addresses of the first subnet. iv. Find the first and 
+last addresses of the last subnet. 
+Initial Information: 
+● Network Address: 130.56.0.0. This is a Class B address, so the default mask is /16. 
+● Required Subnets: 1024. 
+i. Find the subnet mask. 
+● We need to find the number of bits (s) to borrow such that 2^s \ge 1024. 
+● 2^{10} = 1024. So, we need to borrow 10 bits. 
+● New prefix = Default prefix + borrowed bits = 16 + 10 = /26. 
+● The subnet mask is /26, which in decimal is 255.255.255.192. 
+ii. Find the number of addresses in each subnet. 
+● The number of host bits (h) is 32 - \text{new prefix} = 32 - 26 = 6 bits. 
+● The number of addresses per subnet is 2^h = 2^6 = 64. 
+iii. Find the first and last addresses of the first subnet. 
+● The first subnet is always the original network address with the new mask. 
+● First Address (Network ID): 130.56.0.0 
+● The subnet has 64 addresses, so the block size is 64. The range is 0-63 in the last octet. 
+● Last Address (Broadcast ID): 130.56.0.63 
+iv. Find the first and last addresses of the last subnet. 
+● There are 1024 subnets in total (from subnet 0 to subnet 1023). 
+● The borrowed bits are 10 (2 from the third octet and 8 from the fourth octet... wait, this is 
+incorrect). The 16 host bits are in the 3rd and 4th octets. We borrow the first 10. This 
+means we borrow all 8 bits from the third octet, and the first 2 bits from the fourth octet. 
+● For the last subnet, all 10 borrowed bits will be '1'. 
+● The third octet (8 bits) will be 11111111 = 255. 
+● The first 2 bits of the fourth octet will be 11. 
+● To find the network ID of this last subnet, we set the host bits to 0. The host bits are the 
+last 6 bits of the fourth octet. 
+● Fourth octet = 11000000 = 192. 
+● So, the First Address (Network ID) of the last subnet is 130.56.255.192. 
+● The block size is 64. The range is 192-255. 
+● The Last Address (Broadcast ID) of the last subnet is 130.56.255.255. 
+11. An organization is granted a block of addresses starting with 190.100.0.0/26. The 
+organization needs to have four subnets. Write down the subnet addresses and the range 
+of addresses for each subnets? 
+1. Analyze the Existing Block: 
+● The given block is 190.100.0.0/26. 
+● The mask /26 means the current block size is 2^{(32-26)} = 2^6 = 64 addresses. 
+● The range of this block is 190.100.0.0 to 190.100.0.63. 
+2. Determine Bits to Borrow: 
+● The organization needs four subnets from this block. 
+● We need to find the number of bits (n) to borrow such that 2^n \ge 4. 
+● 2^2 = 4. So, we need to borrow 2 more bits. 
+3. Calculate the New Subnet Mask: 
+● The new subnet mask prefix is the old prefix plus the borrowed bits: 26 + 2 = /28. 
+● The new mask is 255.255.255.240. 
+4. Calculate New Subnet Details: 
+● Number of addresses per new subnet: 2^{(32-28)} = 2^4 = 16. 
+● Block Size (Increment): The increment is 16 in the fourth octet. 
+
+5. List the Subnets and Ranges: We will create four subnets of size 16 within the original 
+190.100.0.0 - 190.100.0.63 range. 
+● Subnet 1: 
+○ Subnet Address: 190.100.0.0/28 
+○ Range of Addresses: 190.100.0.0 - 190.100.0.15 
+● Subnet 2: 
+○ Subnet Address: 190.100.0.16/28 
+○ Range of Addresses: 190.100.0.16 - 190.100.0.31 
+● Subnet 3: 
+○ Subnet Address: 190.100.0.32/28 
+○ Range of Addresses: 190.100.0.32 - 190.100.0.47 
+● Subnet 4: 
+○ Subnet Address: 190.100.0.48/28 
+○ Range of Addresses: 190.100.0.48 - 190.100.0.63

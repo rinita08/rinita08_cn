@@ -1,0 +1,129 @@
+anu
+
+public class StopAndWaitARQ { 
+public static void main(String[] args) { 
+int totalFrames = 5; 
+for (int i = 0; i < totalFrames; i++) { 
+System.out.println("Sending Frame: " + i); 
+System.out.println("Waiting for ACK of Frame: " + i); 
+System.out.println("ACK received for Frame: " + i + "\n"); 
+} 
+} 
+}
+
+
+debu
+
+Sender.java (Client) 
+import java.io.*; 
+import java.net.*; 
+ 
+public class Sender { 
+    public static void main(String[] args) throws Exception { 
+        String[] data = {"Frame1", "Frame2", "Frame3", "Frame4", 
+"end"}; 
+        Socket socket = new Socket("localhost", 9999); 
+        System.out.println("Connected to receiver."); 
+ 
+        DataInputStream in = new 
+DataInputStream(socket.getInputStream()); 
+        DataOutputStream out = new 
+DataOutputStream(socket.getOutputStream()); 
+ 
+        int sequenceNumber = 0; 
+ 
+        for (String frame : data) { 
+            boolean ackReceived = false; 
+            while (!ackReceived) { 
+                // Send the frame with sequence number 
+                String packet = sequenceNumber + ":" + frame; 
+                out.writeUTF(packet); 
+                System.out.println("Sent: " + packet); 
+ 
+                // Set a timeout for the acknowledgment 
+                socket.setSoTimeout(2000); // 2 seconds timeout 
+ 
+                try { 
+                    // Wait for ACK 
+                    String ackString = in.readUTF(); 
+                    int ackNum = Integer.parseInt(ackString); 
+                    System.out.println("Received ACK: " + ackNum); 
+ 
+                    if (ackNum == sequenceNumber + 1) { 
+                        ackReceived = true; 
+                        sequenceNumber++; // Move to the next sequence 
+number 
+                    } 
+                } catch (SocketTimeoutException e) { 
+                    System.out.println("Timeout! Resending the 
+frame..."); 
+                } 
+            } 
+        } 
+        socket.close(); 
+    } 
+} 
+ 
+Receiver.java (Server) 
+import java.io.*; 
+import java.net.*; 
+import java.util.Random; 
+ 
+public class Receiver { 
+    public static void main(String[] args) throws Exception { 
+        ServerSocket serverSocket = new ServerSocket(9999); 
+        System.out.println("Receiver is ready."); 
+        Socket socket = serverSocket.accept(); 
+        System.out.println("Sender connected."); 
+ 
+        DataInputStream in = new 
+DataInputStream(socket.getInputStream()); 
+        DataOutputStream out = new 
+DataOutputStream(socket.getOutputStream()); 
+ 
+        int expectedSequenceNumber = 0; 
+        Random random = new Random(); 
+ 
+        while (true) { 
+            String receivedPacket = in.readUTF(); 
+            String[] parts = receivedPacket.split(":", 2); 
+            int receivedSeqNum = Integer.parseInt(parts[0]); 
+            String data = parts[1]; 
+ 
+            System.out.println("Received: " + receivedPacket); 
+ 
+            if (data.equals("end")) { 
+                break; 
+            } 
+ 
+            // Simulate packet loss occasionally (e.g., 25% chance to 
+"lose" packet) 
+            if (random.nextInt(4) == 0) { 
+                 System.out.println("SIMULATING PACKET LOSS. NOT 
+SENDING ACK."); 
+                 continue; // Don't send ACK, sender will time out. 
+            } 
+ 
+            if (receivedSeqNum == expectedSequenceNumber) { 
+                System.out.println("Data received successfully: " + 
+data); 
+                // Send ACK for the next expected frame 
+                int ackNum = expectedSequenceNumber + 1; 
+                out.writeUTF(String.valueOf(ackNum)); 
+                System.out.println("Sent ACK: " + ackNum); 
+                expectedSequenceNumber++; 
+            } else { 
+                System.out.println("Duplicate or out-of-order frame 
+received. Resending last ACK."); 
+                // Resend ACK for the frame it's still waiting for 
+                int ackNum = expectedSequenceNumber; 
+                out.writeUTF(String.valueOf(ackNum)); 
+                 System.out.println("Sent duplicate ACK: " + ackNum); 
+            } 
+        } 
+ 
+        socket.close(); 
+        serverSocket.close(); 
+        System.out.println("Connection closed."); 
+    } 
+} 

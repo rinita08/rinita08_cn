@@ -1,0 +1,117 @@
+anu 
+
+UpperServer.java 
+import java.io.*; 
+import java.net.*; 
+public class UpperServer { 
+public static void main(String[] args) throws IOException { 
+ServerSocket ss = new ServerSocket(5001); 
+Socket s = ss.accept(); 
+BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream())); 
+PrintWriter out = new PrintWriter(s.getOutputStream(), true); 
+String input = in.readLine(); 
+out.println(input.toUpperCase()); 
+ss.close(); 
+} 
+} 
+UpperClient.java 
+import java.io.*; 
+import java.net.*; 
+public class UpperClient { 
+public static void main(String[] args) throws IOException { 
+Socket s = new Socket("localhost", 5001); 
+PrintWriter out = new PrintWriter(s.getOutputStream(), true); 
+out.println("hello world"); 
+BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream())); 
+System.out.println("Uppercase from server: " + in.readLine()); 
+s.close(); 
+} 
+} 
+
+
+debu
+
+UppercaseServer.java 
+import java.io.*; 
+import java.net.*; 
+ 
+public class UppercaseServer { 
+    public static void main(String[] args) { 
+        try { 
+            ServerSocket serverSocket = new ServerSocket(8888); 
+            System.out.println("Server is running and waiting for 
+connections..."); 
+ 
+            Socket clientSocket = serverSocket.accept(); 
+            System.out.println("Client connected: " + 
+clientSocket.getInetAddress().getHostAddress()); 
+ 
+            // Setup streams 
+            BufferedReader reader = new BufferedReader(new 
+InputStreamReader(clientSocket.getInputStream())); 
+            PrintWriter writer = new 
+PrintWriter(clientSocket.getOutputStream(), true); 
+ 
+            // Read string from client 
+            String clientString = reader.readLine(); 
+            System.out.println("Received from client: " + 
+clientString); 
+ 
+            // Convert to uppercase and send back 
+            String uppercaseString = clientString.toUpperCase(); 
+            writer.println(uppercaseString); 
+            System.out.println("Sent to client: " + uppercaseString); 
+ 
+            // Close resources 
+            reader.close(); 
+            writer.close(); 
+            clientSocket.close(); 
+            serverSocket.close(); 
+            System.out.println("Connection closed."); 
+ 
+        } catch (IOException e) { 
+            e.printStackTrace(); 
+        } 
+    } 
+} 
+ 
+UppercaseClient.java 
+import java.io.*; 
+import java.net.*; 
+ 
+public class UppercaseClient { 
+    public static void main(String[] args) { 
+        try { 
+            Socket socket = new Socket("localhost", 8888); 
+            System.out.println("Connected to the server."); 
+ 
+            // Setup streams 
+            BufferedReader reader = new BufferedReader(new 
+InputStreamReader(socket.getInputStream())); 
+            PrintWriter writer = new 
+PrintWriter(socket.getOutputStream(), true); 
+            BufferedReader consoleReader = new BufferedReader(new 
+InputStreamReader(System.in)); 
+ 
+            // Read string from user 
+            System.out.print("Enter a string to send to the server: 
+"); 
+            String stringToSend = consoleReader.readLine(); 
+ 
+            // Send string to server 
+            writer.println(stringToSend); 
+ 
+            // Receive uppercase string from server and print it 
+            String receivedString = reader.readLine(); 
+            System.out.println("Server response: " + receivedString); 
+ 
+            // Close resources 
+            reader.close(); 
+            writer.close(); 
+            socket.close(); 
+ 
+        } catch (IOException e) { 
+            e.printStackTrace(); 
+        } 
+    } 
+} 
