@@ -59,6 +59,11 @@ IP address, this means adding 2047 to the host part.
 ○ The last octet will be 255. The third octet will be 32 + (2048 / 256 - 1) = 32 + 7 = 39. 
 ○ So, the last address is 205.16.39.255. 
 ● Address Range: The range of addresses is from 205.16.32.0 to 205.16.39.255. 
+
+
+
+
+
 5. A company is granted the site address 201.70.64.0. The company needs six subnets 
 design the subnets. 
 1. Determine Bits to Borrow: 
